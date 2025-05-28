@@ -9,6 +9,8 @@ class Tipe extends Model
 {
     use HasFactory;
 
+    protected $fillable = ['nama'];
+
     public function Barang()
     {
         return $this->hasMany(Barang::class);

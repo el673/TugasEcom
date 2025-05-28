@@ -13,20 +13,20 @@ class TipeSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('tipes')->insert([
-            "nama" => "Kain"
-        ]);
-        DB::table('tipes')->insert([
-            "nama" => "Aksesoris"
-        ]);
-        DB::table('tipes')->insert([
-            "nama" => "Kayu"
-        ]);
-        DB::table('tipes')->insert([
-            "nama" => "Anyaman"
-        ]);
-        DB::table('tipes')->insert([
-            "nama" => "AlatMusik"
-        ]);
+        $types = [
+            'Aksesoris',
+            'Tas',
+            'Alat Musik',
+            'Pakaian Adat',
+            'Kerajinan Tangan'
+        ];
+
+        foreach ($types as $type) {
+            DB::table('tipes')->insert([
+                'nama' => $type,
+                'created_at' => now(),
+                'updated_at' => now()
+            ]);
+        }
     }
 }

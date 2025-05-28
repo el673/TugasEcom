@@ -1,46 +1,40 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('layouts.app')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
+@section('content')
+<div class="container mx-auto px-4 py-8">
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-800">Welcome, {{ auth()->user()->name }}!</h1>
+        <p class="text-gray-600">Selamat datang di Kerajinan Lokal.</p>
+    </div>
 
-<body class="bg-gray-100">
-    <nav class="bg-white shadow-lg">
-        <div class="max-w-7xl mx-auto px-4">
-            <div class="flex justify-between h-16">
-                <div class="flex">
-                    <div class="flex-shrink-0 flex items-center">
-                        <h1 class="text-xl font-bold">User Dashboard</h1>
-                    </div>
-                </div>
-                <div class="flex items-center">
-                    <div class="ml-4 flex items-center md:ml-6">
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <button type="submit" class="text-gray-600 hover:text-gray-800">Logout</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div class="px-4 py-6 sm:px-0">
-            <div class="bg-white overflow-hidden shadow rounded-lg">
-                <div class="p-6">
-                    <h2 class="text-lg font-medium text-gray-900">Welcome, {{ Auth::user()->name }}!</h2>
-                    <p class="mt-1 text-sm text-gray-500">
-                        This is your personal dashboard. You're logged in as a {{ Auth::user()->role }}.
-                    </p>
-                </div>
+    <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+        <div class="p-6">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Daftar Produk Kerajinan Lokal</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Produk</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Harga</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stok</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipe</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Asal Daerah</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        @foreach(\App\Models\Barang::with('tipe')->get() as $product)
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap">{{ $product->nama_produk }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">Rp {{ number_format($product->harga_produk, 0, ',', '.') }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">{{ $product->stok }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">{{ $product->tipe->nama }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">{{ $product->asal_daerah }}</td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
-</body>
-
-</html>
+</div>
+@endsection

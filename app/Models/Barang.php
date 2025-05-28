@@ -9,10 +9,17 @@ class Barang extends Model
 {
     use HasFactory;
 
-    public function Tipe()
+    protected $fillable = [
+        'nama_produk',
+        'harga_produk',
+        'jumlah_produk',
+        'id_tipe',
+        'stok',
+        'asal_daerah'
+    ];
+
+    public function tipe()
     {
         return $this->belongsTo(Tipe::class, 'id_tipe');
     }
-
-    protected $fillable = ['nama_produk', 'jumlah_produk', 'harga_produk', 'id_tipe',];
 }

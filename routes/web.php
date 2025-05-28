@@ -9,6 +9,8 @@ use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\CheckOutController;
 use App\Http\Controllers\KeranjangController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\ProductController;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,35 +31,24 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Admin Routes
-Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
-    // Admin Dashboard
-    Route::get('/dashboard', function () {
-        return view('admin.dashboard');
-    })->name('admin.dashboard');
+Route::middleware(['auth', 'is_admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+    Route::get('/users', [AdminController::class, 'users'])->name('users');
+    Route::delete('/users/{user}', [AdminController::class, 'destroyUser'])->name('users.destroy');
+});
 
-    // Admin Users Management
-    Route::get('/users', function () {
-        return view('admin.users');
-    })->name('admin.users');
-
-    // Admin Barang Management
-    Route::get('/barang/create', [BarangController::class, 'create'])->name('barang.create');
-    Route::post('/barang', [BarangController::class, 'store'])->name('barang.store');
-    Route::get('/barang/{id}/edit', [BarangController::class, 'edit'])->name('barang.edit');
-    Route::put('/barang/{id}', [BarangController::class, 'update'])->name('barang.update');
-    Route::delete('/barang/{id}', [BarangController::class, 'destroy'])->name('barang.destroy');
-
-    // Admin Tipe Management
-    Route::get('/tipe/create', [TipeController::class, 'create'])->name('tipe.create');
-    Route::post('/tipe', [TipeController::class, 'store'])->name('tipe.store');
-    Route::get('/tipe/{id}/edit', [TipeController::class, 'edit'])->name('tipe.edit');
-    Route::put('/tipe/{id}', [TipeController::class, 'update'])->name('tipe.update');
-    Route::delete('/tipe/{id}', [TipeController::class, 'destroy'])->name('tipe.destroy');
+// Resource Routes for Admin
+Route::middleware(['auth', 'is_admin'])->group(function () {
+    Route::resource('barang', BarangController::class);
+    Route::resource('tipe', TipeController::class);
 });
 
 // User Routes (Protected)
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', function () {
+        if (auth()->user()->role === 'admin') {
+            return redirect()->route('admin.dashboard');
+        }
         return view('dashboard');
     })->name('dashboard');
 
@@ -67,7 +58,13 @@ Route::middleware(['auth'])->group(function () {
 
 // Public Routes (Both admin and users can access)
 Route::get('/', function () {
-    return view('welcome');
+    if (auth()->check()) {
+        if (auth()->user()->role === 'admin') {
+            return redirect()->route('admin.dashboard');
+        }
+        return redirect()->route('dashboard');
+    }
+    return redirect()->route('login');
 });
 
 Route::get('/home', [HomeController::class, 'index']);
@@ -81,3 +78,6 @@ Route::get('/tipe', [TipeController::class, 'index'])->name('tipe.index');
 Route::get('/barangapi', function () {
     return view('barangapi');
 });
+
+// Route untuk user melihat produk
+Route::get('/products', [ProductController::class, 'index'])->name('products.index');
