@@ -9,10 +9,10 @@ class Tipe extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['nama'];
+    protected $fillable = ['nama_tipe'];
 
-    public function Barang()
+    public function barangs()
     {
-        return $this->hasMany(Barang::class);
+        return $this->hasMany(Barang::class, 'id_tipe');
     }
 }

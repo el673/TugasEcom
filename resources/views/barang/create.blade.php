@@ -5,12 +5,6 @@
 
 @section('content')
 <div class="max-w-2xl mx-auto">
-    <div class="flex justify-end mb-4">
-        <a href="{{ route('barang.index') }}" class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600">
-            Back
-        </a>
-    </div>
-
     <div class="bg-white shadow-lg rounded-lg p-6">
         @if ($errors->any())
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
@@ -59,8 +53,11 @@
                 <label for="id_tipe" class="block text-sm font-medium text-gray-700">Tipe</label>
                 <select name="id_tipe" id="id_tipe" required
                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                    <option value="">Select Tipe</option>
-                    @foreach(\App\Models\Tipe::all() as $tipe)
+                    <option value="">Pilih Tipe</option>
+                    @php
+                    $tipes = \App\Models\Tipe::orderBy('nama_tipe')->get();
+                    @endphp
+                    @foreach($tipes as $tipe)
                     <option value="{{ $tipe->id }}" {{ old('id_tipe') == $tipe->id ? 'selected' : '' }}>
                         {{ $tipe->nama_tipe }}
                     </option>

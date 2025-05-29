@@ -9,80 +9,68 @@ use Illuminate\Support\Facades\Auth;
 
 class TipeController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+        $this->middleware('is_admin');
+    }
+
     public function index()
     {
-        $tipe = Tipe::all();
-        return view('tipe.index', compact('tipe'));
+        $tipes = Tipe::orderBy('nama_tipe')->get();
+        return view('tipe.index', compact('tipes'));
     }
 
     public function create()
     {
-        if (!Auth::user()->role === 'admin') {
-            return redirect()->route('tipe.index')
-                ->with('error', 'Unauthorized access. Admin privileges required.');
-        }
         return view('tipe.create');
     }
 
     public function store(Request $request)
     {
-        if (!Auth::user()->role === 'admin') {
-            return redirect()->route('tipe.index')
-                ->with('error', 'Unauthorized access. Admin privileges required.');
-        }
-
         $validatedData = $request->validate([
-            'nama_tipe' => 'required|max:255',
-            // Add other validation rules as needed
+            'nama_tipe' => 'required|string|max:255|unique:tipes,nama_tipe'
         ]);
 
         Tipe::create($validatedData);
 
         return redirect()->route('tipe.index')
-            ->with('success', 'Tipe created successfully.');
+            ->with('success', 'Tipe berhasil ditambahkan.');
     }
 
     public function edit($id)
     {
-        if (!Auth::user()->role === 'admin') {
-            return redirect()->route('tipe.index')
-                ->with('error', 'Unauthorized access. Admin privileges required.');
-        }
-
         $tipe = Tipe::findOrFail($id);
         return view('tipe.edit', compact('tipe'));
     }
 
     public function update(Request $request, $id)
     {
-        if (!Auth::user()->role === 'admin') {
-            return redirect()->route('tipe.index')
-                ->with('error', 'Unauthorized access. Admin privileges required.');
-        }
+        $tipe = Tipe::findOrFail($id);
 
         $validatedData = $request->validate([
-            'nama_tipe' => 'required|max:255',
-            // Add other validation rules as needed
+            'nama_tipe' => 'required|string|max:255|unique:tipes,nama_tipe,' . $id
         ]);
 
-        $tipe = Tipe::findOrFail($id);
         $tipe->update($validatedData);
 
         return redirect()->route('tipe.index')
-            ->with('success', 'Tipe updated successfully.');
+            ->with('success', 'Tipe berhasil diperbarui.');
     }
 
     public function destroy($id)
     {
-        if (!Auth::user()->role === 'admin') {
+        $tipe = Tipe::findOrFail($id);
+
+        // Check if tipe is being used by any barang
+        if ($tipe->barangs()->exists()) {
             return redirect()->route('tipe.index')
-                ->with('error', 'Unauthorized access. Admin privileges required.');
+                ->with('error', 'Tipe tidak dapat dihapus karena sedang digunakan.');
         }
 
-        $tipe = Tipe::findOrFail($id);
         $tipe->delete();
 
         return redirect()->route('tipe.index')
-            ->with('success', 'Tipe deleted successfully.');
+            ->with('success', 'Tipe berhasil dihapus.');
     }
 }

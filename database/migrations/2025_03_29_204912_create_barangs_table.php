@@ -14,9 +14,11 @@ return new class extends Migration
         Schema::create('barangs', function (Blueprint $table) {
             $table->id();
             $table->string('nama_produk');
-            $table->string('jumlah_produk');
-            $table->string('harga_produk');
-            $table->integer('id_tipe');
+            $table->integer('jumlah_produk');
+            $table->decimal('harga_produk', 10, 2);
+            $table->foreignId('id_tipe')->constrained('tipes')->onDelete('cascade');
+            $table->integer('stok')->default(0);
+            $table->string('asal_daerah')->nullable();
             $table->timestamps();
         });
     }

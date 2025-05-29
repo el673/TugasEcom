@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\BarangController;
+use App\Http\Controllers\Api\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,8 +16,17 @@ use App\Http\Controllers\Api\BarangController;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
+// Public routes
+Route::post('/login', [AuthController::class, 'login']);
 
-Route::apiResource('barangs', BarangController::class);
+// Protected routes
+Route::middleware(['auth:sanctum'])->group(function () {
+    // Auth routes
+    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::get('/me', [AuthController::class, 'me']);
+
+    // Barang routes - admin only
+    Route::middleware(['is_admin'])->group(function () {
+        Route::apiResource('barangs', BarangController::class);
+    });
+});

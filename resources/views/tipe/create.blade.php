@@ -1,13 +1,13 @@
 @extends('layouts.admin')
 
-@section('title', 'Create Tipe')
-@section('header', 'Create New Tipe')
+@section('title', 'Tambah Tipe')
+@section('header', 'Tambah Tipe Baru')
 
 @section('content')
 <div class="max-w-2xl mx-auto">
     <div class="flex justify-end mb-4">
         <a href="{{ route('tipe.index') }}" class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600">
-            Back
+            Kembali
         </a>
     </div>
 
@@ -34,7 +34,7 @@
             <div>
                 <button type="submit"
                     class="w-full bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">
-                    Create Tipe
+                    Simpan Tipe
                 </button>
             </div>
         </form>

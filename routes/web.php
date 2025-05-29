@@ -11,6 +11,7 @@ use App\Http\Controllers\KeranjangController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\Api\BarangController as ApiBarangController;
 
 /*
 |--------------------------------------------------------------------------
@@ -81,3 +82,12 @@ Route::get('/barangapi', function () {
 
 // Route untuk user melihat produk
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
+
+// API route in web routes (for backward compatibility)
+Route::get('/barang/api', function () {
+    $barang = \App\Models\Barang::with(['tipe' => function ($query) {
+        $query->select('id', 'nama_tipe');
+    }])->select('id', 'nama_produk', 'jumlah_produk', 'harga_produk', 'id_tipe', 'created_at', 'updated_at')->get();
+
+    return response()->json($barang, 200, [], JSON_PRETTY_PRINT);
+});

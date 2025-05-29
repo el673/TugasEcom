@@ -8,14 +8,26 @@ use App\Http\Controllers\Controller;
 
 class BarangController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth:sanctum');
+        $this->middleware('is_admin');
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        return response()->json(
-            Barang::with('Tipe')->get()
-        );
+        try {
+            $barang = Barang::with('tipe:id,nama_tipe')
+                ->select('id', 'nama_produk', 'jumlah_produk', 'harga_produk', 'id_tipe', 'stok', 'asal_daerah')
+                ->get();
+
+            return response()->json(['status' => 'success', 'data' => $barang]);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => 'Failed to fetch data'], 500);
+        }
     }
 
     /**
@@ -23,14 +35,21 @@ class BarangController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'nama_produk' => 'required|string',
-            'jumlah_produk' => 'required|integer',
-            'harga_produk' => 'required|numeric',
-            'id_tipe' => 'required|exists:tipes,id',
-        ]);
-        $barang = Barang::create($request->all());
-        return response()->json($barang, 201);
+        try {
+            $validated = $request->validate([
+                'nama_produk' => 'required|string',
+                'harga_produk' => 'required|numeric',
+                'jumlah_produk' => 'required|integer',
+                'stok' => 'required|integer',
+                'id_tipe' => 'required|exists:tipes,id',
+                'asal_daerah' => 'nullable|string'
+            ]);
+
+            $barang = Barang::create($validated);
+            return response()->json(['status' => 'success', 'data' => $barang], 201);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => $e->getMessage()], 422);
+        }
     }
 
     /**
@@ -38,8 +57,12 @@ class BarangController extends Controller
      */
     public function show($id)
     {
-        $barang = Barang::with('Tipe')->findOrFail($id);
-        return response()->json($barang);
+        try {
+            $barang = Barang::with('tipe')->findOrFail($id);
+            return response()->json(['status' => 'success', 'data' => $barang]);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => 'Data not found'], 404);
+        }
     }
 
     /**
@@ -47,25 +70,34 @@ class BarangController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $barang = Barang::findOrFail($id);
+        try {
+            $barang = Barang::findOrFail($id);
+            $validated = $request->validate([
+                'nama_produk' => 'sometimes|string',
+                'harga_produk' => 'sometimes|numeric',
+                'jumlah_produk' => 'sometimes|integer',
+                'stok' => 'sometimes|integer',
+                'id_tipe' => 'sometimes|exists:tipes,id',
+                'asal_daerah' => 'nullable|string'
+            ]);
 
-        $request->validate([
-            'nama_produk' => 'sometimes|required|string',
-            'jumlah_produk' => 'sometimes|required|integer',
-            'harga_produk' => 'sometimes|required|numeric',
-            'id_tipe' => 'sometimes|required|exists:tipes,id',
-        ]);
-
-        $barang->update($request->all());
-        return response()->json($barang);
+            $barang->update($validated);
+            return response()->json(['status' => 'success', 'data' => $barang]);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => $e->getMessage()], 422);
+        }
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy($id)
     {
-        Barang::destroy($id);
-        return response()->json(null, 204);
+        try {
+            Barang::findOrFail($id)->delete();
+            return response()->json(['status' => 'success', 'message' => 'Data deleted']);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => 'Failed to delete'], 404);
+        }
     }
 }
