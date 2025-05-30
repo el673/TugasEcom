@@ -5,11 +5,6 @@
 
 @section('content')
 <div class="max-w-2xl mx-auto">
-    <div class="flex justify-end mb-4">
-        <a href="{{ route('barang.index') }}" class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600">
-            Back
-        </a>
-    </div>
 
     <div class="bg-white shadow-lg rounded-lg p-6">
         @if ($errors->any())
@@ -81,5 +76,6 @@
             </div>
         </form>
     </div>
+</div>
 </div>
 @endsection
